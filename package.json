@@ -1,0 +1,21 @@
+{
+  "name": "kinda-store-common",
+  "version": "0.1.0",
+  "description": "...",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/kinda/kinda-store-common"
+  },
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Manuel Vila <mvila@3base.com>",
+  "license": "MIT",
+  "dependencies": {
+    "bytewise": "^0.7.0",
+    "kinda-object": "kinda/kinda-object",
+    "lodash": "^2.4.1",
+    "object-is": "0.0.0"
+  }
+}
