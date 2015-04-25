@@ -5,7 +5,7 @@ if (!Object.is) Object.is = require('object-is');
 var bytewise = require('bytewise');
 var KindaObject = require('kinda-object');
 
-var CommonStore = KindaObject.extend('CommonStore', function() {
+var AbstractStore = KindaObject.extend('AbstractStore', function() {
   this.setOptions = function(options) {
     if (!options) options = {};
     this.keyEncoding = options.keyEncoding || 'bytewise';
@@ -200,4 +200,4 @@ var CommonStore = KindaObject.extend('CommonStore', function() {
   };
 });
 
-module.exports = CommonStore;
+module.exports = AbstractStore;

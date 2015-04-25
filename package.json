@@ -1,10 +1,10 @@
 {
-  "name": "kinda-store-common",
+  "name": "kinda-abstract-store",
   "version": "0.1.5",
   "description": "...",
   "repository": {
     "type": "git",
-    "url": "git://github.com/kinda/kinda-store-common"
+    "url": "git://github.com/kinda/kinda-abstract-store"
   },
   "main": "index.js",
   "scripts": {
