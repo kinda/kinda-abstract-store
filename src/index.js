@@ -1,26 +1,25 @@
 'use strict';
 
-var _ = require('lodash');
+let _ = require('lodash');
 if (!Object.is) Object.is = require('object-is');
-var bytewise = require('bytewise');
-var KindaObject = require('kinda-object');
+let bytewise = require('bytewise');
+let KindaObject = require('kinda-object');
 
-var AbstractStore = KindaObject.extend('AbstractStore', function() {
-  this.setOptions = function(options) {
-    if (!options) options = {};
+let AbstractStore = KindaObject.extend('AbstractStore', function() {
+  this.setOptions = function(options = {}) {
     this.keyEncoding = options.keyEncoding || 'bytewise';
     this.valueEncoding = options.valueEncoding || 'json';
   };
 
   this.encode = function(value, encoding) {
     switch (encoding) {
-    case 'bytewise':
-      return new Buffer(bytewise.encode(value)); // bytewise.encode return a Uint8Array in the browser
-    case 'json':
-      if (typeof value === 'undefined') return;
-      return new Buffer(JSON.stringify(value));
-    default:
-      throw new Error('unknown encoding');
+      case 'bytewise':
+        return new Buffer(bytewise.encode(value)); // bytewise.encode return a Uint8Array in the browser
+      case 'json':
+        if (typeof value === 'undefined') return undefined;
+        return new Buffer(JSON.stringify(value));
+      default:
+        throw new Error('unknown encoding');
     }
   };
 
@@ -36,12 +35,12 @@ var AbstractStore = KindaObject.extend('AbstractStore', function() {
 
   this.decode = function(value, encoding) {
     switch (encoding) {
-    case 'bytewise':
-      return bytewise.decode(value);
-    case 'json':
-      return JSON.parse(value);
-    default:
-      throw new Error('unknown encoding');
+      case 'bytewise':
+        return bytewise.decode(value);
+      case 'json':
+        return JSON.parse(value);
+      default:
+        throw new Error('unknown encoding');
     }
   };
 
@@ -56,9 +55,8 @@ var AbstractStore = KindaObject.extend('AbstractStore', function() {
   };
 
   this.getPreviousKey = function(key) {
-    if (this.keyEncoding !== 'bytewise')
-      throw new Error('unimplemented encoding');
-    var keys = _.clone(key);
+    if (this.keyEncoding !== 'bytewise') throw new Error('unimplemented encoding');
+    let keys = _.clone(key);
     if (!keys.length) return keys;
     key = keys.pop();
     key = this._getPreviousKey(key);
@@ -71,7 +69,7 @@ var AbstractStore = KindaObject.extend('AbstractStore', function() {
       return key - 0.000001; // TODO: try to increase precision
     } else if (_.isString(key)) {
       if (!key.length) return key;
-      var end = key.substr(-1);
+      let end = key.substr(-1);
       key = key.substr(0, key.length - 1);
       end = String.fromCharCode(end.charCodeAt(0) - 1);
       end += '\uFFFF';
@@ -82,9 +80,8 @@ var AbstractStore = KindaObject.extend('AbstractStore', function() {
   };
 
   this.getNextKey = function(key) {
-    if (this.keyEncoding !== 'bytewise')
-      throw new Error('unimplemented encoding');
-    var keys = _.clone(key);
+    if (this.keyEncoding !== 'bytewise') throw new Error('unimplemented encoding');
+    let keys = _.clone(key);
     if (!keys.length) return keys;
     key = keys.pop();
     key = this._getNextKey(key);
@@ -97,7 +94,7 @@ var AbstractStore = KindaObject.extend('AbstractStore', function() {
       return key + 0.000001; // TODO: try to increase precision
     } else if (_.isString(key)) {
       if (!key.length) return key;
-      var end = key.substr(-1);
+      let end = key.substr(-1);
       key = key.substr(0, key.length - 1);
       end += '\u0001';
       return key + end;
@@ -107,33 +104,28 @@ var AbstractStore = KindaObject.extend('AbstractStore', function() {
   };
 
   this.getEmptyKey = function() {
-    if (this.keyEncoding !== 'bytewise')
-      throw new Error('unimplemented encoding');
+    if (this.keyEncoding !== 'bytewise') throw new Error('unimplemented encoding');
     return [];
   };
 
   this.getMinimumKey = function() {
-    if (this.keyEncoding !== 'bytewise')
-      throw new Error('unimplemented encoding');
+    if (this.keyEncoding !== 'bytewise') throw new Error('unimplemented encoding');
     return [null];
   };
 
   this.getMaximumKey = function() {
-    if (this.keyEncoding !== 'bytewise')
-      throw new Error('unimplemented encoding');
+    if (this.keyEncoding !== 'bytewise') throw new Error('unimplemented encoding');
     return [undefined];
   };
 
   this.normalizeKey = function(key) {
-    if (this.keyEncoding !== 'bytewise')
-      throw new Error('unimplemented encoding');
+    if (this.keyEncoding !== 'bytewise') throw new Error('unimplemented encoding');
     if (!_.isArray(key)) key = [key];
     return key;
   };
 
   this.concatKeys = function(key1, key2) {
-    if (this.keyEncoding !== 'bytewise')
-      throw new Error('unimplemented encoding');
+    if (this.keyEncoding !== 'bytewise') throw new Error('unimplemented encoding');
     return key1.concat(key2);
   };
 
@@ -141,19 +133,16 @@ var AbstractStore = KindaObject.extend('AbstractStore', function() {
     options = _.clone(options);
 
     if (options.hasOwnProperty('value')) {
-      if (options.hasOwnProperty('start'))
-        throw new Error('invalid key selector');
-      if (options.hasOwnProperty('end'))
-        throw new Error('invalid key selector');
+      if (options.hasOwnProperty('start')) throw new Error('invalid key selector');
+      if (options.hasOwnProperty('end')) throw new Error('invalid key selector');
       options.start = options.value;
       options.end = options.value;
     }
 
-    var key;
+    let key;
 
     if (options.hasOwnProperty('start')) {
-      if (options.hasOwnProperty('startAfter'))
-        throw new Error('invalid key selector');
+      if (options.hasOwnProperty('startAfter')) throw new Error('invalid key selector');
       options.start = this.normalizeKey(options.start);
     }
     if (options.hasOwnProperty('startAfter')) {
@@ -162,14 +151,15 @@ var AbstractStore = KindaObject.extend('AbstractStore', function() {
       options.start = key;
       delete options.startAfter;
     }
-    if (!options.hasOwnProperty('start'))
+    if (!options.hasOwnProperty('start')) {
       options.start = this.getEmptyKey();
-    if (options.reverse)
+    }
+    if (options.reverse) {
       options.start = this.concatKeys(options.start, this.getMaximumKey());
+    }
 
     if (options.hasOwnProperty('end')) {
-      if (options.hasOwnProperty('endBefore'))
-        throw new Error('invalid key selector');
+      if (options.hasOwnProperty('endBefore')) throw new Error('invalid key selector');
       options.end = this.normalizeKey(options.end);
     }
     if (options.hasOwnProperty('endBefore')) {
@@ -178,20 +168,22 @@ var AbstractStore = KindaObject.extend('AbstractStore', function() {
       options.end = key;
       delete options.endBefore;
     }
-    if (!options.hasOwnProperty('end'))
+    if (!options.hasOwnProperty('end')) {
       options.end = this.getEmptyKey();
-    if (!options.reverse)
+    }
+    if (!options.reverse) {
       options.end = this.concatKeys(options.end, this.getMaximumKey());
+    }
 
     if (options.hasOwnProperty('prefix')) {
-      var prefix = this.normalizeKey(options.prefix);
+      let prefix = this.normalizeKey(options.prefix);
       options.start = this.concatKeys(prefix, options.start);
       options.end = this.concatKeys(prefix, options.end);
       delete options.prefix;
     }
 
     if (options.reverse) {
-      var tmp = options.start;
+      let tmp = options.start;
       options.start = options.end;
       options.end = tmp;
     }
